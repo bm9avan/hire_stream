@@ -1,0 +1,20 @@
+# Ignore node_modules directory for all projects
+**/node_modules/
+
+# Ignore any .env files (environment configuration)
+**/.env
+
+# Ignore any log files
+**/*.log
+
+# Ignore build or dist directories (output directories)
+**/build/
+**/dist/
+
+# Ignore any temporary files or directories
+**/tmp/
+**/temp/
+
+# Ignore any user-specific or OS-specific files
+.DS_Store
+Thumbs.db
