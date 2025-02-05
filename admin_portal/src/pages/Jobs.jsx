@@ -1,3 +1,4 @@
+import PosterGenerater from "@/components/non-shadcn/PosterGenerater";
 import TableSelecter from "@/components/non-shadcn/TableSelecter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { editActions } from "@/redux/edit/editSlice";
+import { saveAs } from "file-saver";
 import {
   BadgeCheck,
   CheckCircle,
@@ -39,13 +41,11 @@ import {
   Search,
   Trash,
   Users,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import PosterGenerater from "@/components/non-shadcn/PosterGenerater";
-import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 
 const jobStatus = {
@@ -87,6 +87,7 @@ const JobManagement = () => {
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [applications, setApplications] = useState(null);
+  const [selectedApplications, setSelectedApplications] = useState([]);
   const [status, setStatus] = useState("open");
   const [isLoading, setIsLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -96,6 +97,8 @@ const JobManagement = () => {
   const [isMobileJobDetailView, setIsMobileJobDetailView] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  console.log("set selcted users", selectedApplications);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -111,6 +114,12 @@ const JobManagement = () => {
         );
         const data = await response.json();
         setJobs(data.data);
+        if (window.location.pathname.split("/")[2])
+          setSelectedJob(
+            data.data.find(
+              (job) => job.jobId === window.location.pathname.split("/")[2]
+            )
+          );
       } catch (error) {
         console.error("Error fetching jobs:", error);
         toast({
@@ -126,7 +135,7 @@ const JobManagement = () => {
     fetchJobs();
   }, [status]);
 
-  console.log(applications);
+  // console.log(applications);
   useEffect(() => {
     if (!selectedJob) return;
     setApplications(null);
@@ -146,6 +155,9 @@ const JobManagement = () => {
     }
     fetchJob();
   }, [selectedJob]);
+
+  // console.log("data", applications, jobStatus[status]);
+  // console.log("data", selectedJob)
 
   const saveAsExcel = (data, fileName = "data.xlsx") => {
     if (!data || data.length === 0) {
@@ -205,6 +217,18 @@ const JobManagement = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleSelectedUsers = (uids) => {
+    console.log(
+      "using users",
+      uids,
+      applications,
+      applications.filter((application) => !uids.includes(application.uid))
+    );
+    setSelectedApplications(
+      applications.filter((application) => uids.includes(application.uid))
+    );
   };
 
   const handleAcceptUsers = async (uids) => {
@@ -315,9 +339,9 @@ const JobManagement = () => {
 
   const handleJobSelect = (job) => {
     setSelectedJob(job);
-    if (window.innerWidth < 640) {
-      navigate(`/jobs/${job.id}`);
-    }
+    // if (window.innerWidth < 640) {
+    navigate(`/jobs/${job.jobId}`);
+    // }
   };
 
   const icon = jobStatus[status];
@@ -457,6 +481,16 @@ const JobManagement = () => {
           className={`sm:w-2/3 flex flex-col 
             ${window.innerWidth < 640 && !selectedJob ? "hidden" : ""}`}
         >
+          {window.innerWidth < 640 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-0 right-0 z-10"
+              onClick={() => setSelectedJob(null)}
+            >
+              <X className="h-6 w-6" />
+            </Button>
+          )}
           <CardHeader className="flex-row justify-between items-center">
             <CardTitle>Job Details</CardTitle>
             {selectedJob && (
@@ -469,20 +503,61 @@ const JobManagement = () => {
                 <DropdownMenuContent>
                   {status === "closed" && (
                     <PosterGenerater
-                      companyName={selectedJob.company.name}
+                      companyName={selectedJob.company.name.toUpperCase()}
                       jobTitle={selectedJob.role}
-                      list={applications?.map((app) => {
-                        console.log(app);
-                        return {
-                          name: app.user.name,
-                          usn: app.user.uid,
-                          userimg: app.user.profileImageUrl,
-                        };
-                      })}
+                      list={applications
+                        ?.filter((app) => app.currentStatus === "selected")
+                        .map((app) => {
+                          console.log(app);
+                          return {
+                            name: app.user.name,
+                            usn: app.user.uid,
+                            userimg: app.user.profileImageUrl,
+                          };
+                        })}
                     />
                   )}
-                  <DropdownMenuItem onSelect={() => saveAsExcel(applications)}>
-                    Download Excel
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      saveAsExcel(
+                        selectedApplications,
+                        `${selectedJob.company.name}-selected-applications.xlsx`
+                      );
+                    }}
+                    disabled={!selectedApplications.length}
+                  >
+                    Selected Applications Excel
+                  </DropdownMenuItem>
+
+                  {/* <DropdownMenuItem
+                    onSelect={() => {
+                      const statusApps = applications?.filter(
+                        (app) =>
+                          app.currentStatus ===
+                          jobStatus[status].currentStatus.toLowerCase()
+                      );
+                      saveAsExcel(
+                        statusApps,
+                        `${selectedJob.company.name}-${status}-applications.xlsx`
+                      );
+                    }}
+                    disabled={!applications?.length}
+                    className="capitalize"
+                  >
+                    {jobStatus[status].currentStatus.toLowerCase()} Applications
+                    Excel
+                  </DropdownMenuItem> */}
+
+                  <DropdownMenuItem
+                    onSelect={() =>
+                      saveAsExcel(
+                        applications,
+                        `${selectedJob.company.name}-all-applications.xlsx`
+                      )
+                    }
+                    disabled={!applications?.length}
+                  >
+                    All Applications Excel
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -523,10 +598,13 @@ const JobManagement = () => {
                           applications={applications}
                           acceptFn={handleAcceptUsers}
                           rejectFn={handleRejectUsers}
+                          updateSelectedFn={handleSelectedUsers}
                         />
                       )
                     ) : (
-                      <LoaderPinwheel className="w-6 h-6 animate-spin" />
+                      <div className="flex-1 flex items-center justify-center">
+                        <LoaderPinwheel className="w-6 h-6 animate-spin" />
+                      </div>
                     )}
                   </div>
 

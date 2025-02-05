@@ -66,14 +66,24 @@ export default function App() {
                 <Route path="/jobs" element={<Jobs />}>
                   <Route path=":jobId" element={<div>Job Details</div>} />
                 </Route>
-                <Route path="applications" element={<Jobs mode="applied" />} />
+                <Route path="applications" element={<Jobs mode="applied" />}>
+                  <Route path=":jobId" element={<div>Job Details</div>} />
+                </Route>
                 <Route
-                  path="assessments"
+                  path="/assessments"
                   element={<Jobs mode="online-assessment" />}
-                />
-                <Route path="interviews" element={<Jobs mode="interview" />} />
-                <Route path="selected" element={<Jobs mode="selected" />} />
-                <Route path="rejected" element={<Jobs mode="rejected" />} />
+                >
+                  <Route path=":jobId" element={<div>Job Details</div>} />
+                </Route>
+                <Route path="/interviews" element={<Jobs mode="interview" />}>
+                  <Route path=":jobId" element={<div>Job Details</div>} />
+                </Route>
+                <Route path="/selected" element={<Jobs mode="selected" />}>
+                  <Route path=":jobId" element={<div>Job Details</div>} />
+                </Route>
+                <Route path="/rejected" element={<Jobs mode="rejected" />}>
+                  <Route path=":jobId" element={<div>Job Details</div>} />
+                </Route>
                 <Route path="companies" element={<Companies />}></Route>
                 <Route path="/companies/:companyId" element={<Company />} />
                 <Route path="mockinterview" element={<Jobs mode="mock" />} />

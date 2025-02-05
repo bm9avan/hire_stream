@@ -16,7 +16,15 @@ const Company = () => {
   const [companyData, setCompanyData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  console.log(
+    companyId,
+    "company loading",
+    isLoading,
+    "error:",
+    error,
+    "com",
+    companyData
+  );
   useEffect(() => {
     const fetchCompanyDetails = async () => {
       try {
@@ -43,7 +51,7 @@ const Company = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-6 max-w-4xl space-y-6">
         <div className="space-y-4 animate-pulse">
           <div className="flex items-center space-x-4">
             <div className="h-20 w-20 bg-gray-300 rounded-full"></div>
@@ -81,7 +89,7 @@ const Company = () => {
           <img
             src={companyData.logoUrl}
             alt={`${companyData.name} logo`}
-            className="h-24 w-24 object-contain rounded-lg shadow-md"
+            className="h-24 w-24 object-contain rounded-lg shadow-md p-2"
           />
         )}
         <div>
@@ -119,12 +127,14 @@ const Company = () => {
         <CardContent>
           <Accordion type="single" collapsible className="w-full">
             {console.log(companyData.questions)}
-            {companyData.questions.map((question) => (
-              <AccordionItem key={question.id} value={question.id}>
-                <AccordionTrigger>{question}</AccordionTrigger>
-                {/* <AccordionContent>{question.fullText}</AccordionContent> */}
-              </AccordionItem>
-            ))}
+            {companyData.questions
+              ? companyData.questions.map((question) => (
+                  <AccordionItem key={question.id} value={question.id}>
+                    <AccordionTrigger>{question}</AccordionTrigger>
+                    <AccordionContent>{question.fullText}</AccordionContent>
+                  </AccordionItem>
+                ))
+              : "No Data"}
           </Accordion>
         </CardContent>
       </Card>

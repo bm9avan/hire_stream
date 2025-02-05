@@ -1,0 +1,25 @@
+{
+  "name": "hire_stream",
+  "version": "1.0.0",
+  "description": "A comprehensive job portal application structured as a monorepo, containing:",
+  "main": "index.js",
+  "scripts": {
+    "in": "npm install --prefix student_portal && npm install --prefix admin_portal && npm install --prefix backend",
+    "start": "concurrently \"npm start --prefix student_portal\" \"npm start --prefix admin_portal\" \"npm start --prefix backend\"",
+    "dev": "concurrently \"npm run dev --prefix admin_portal\" \"npm run dev --prefix backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bm9avan/hire_stream.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bm9avan/hire_stream/issues"
+  },
+  "homepage": "https://github.com/bm9avan/hire_stream#readme"
+}

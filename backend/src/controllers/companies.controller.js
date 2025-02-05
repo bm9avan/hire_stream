@@ -178,6 +178,8 @@ export const getCompany = async (req, res) => {
       .where(eq(companies.companyId, id))
       .limit(1);
 
+    // const company = await db.query.companies.findFirst({where:(table, fn)=> fn.eq(table.companyId, id), with:{q}})
+
     if (!company.length) {
       return res.status(404).json({
         success: false,

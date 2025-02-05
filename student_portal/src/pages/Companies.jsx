@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Building2, Eye, Loader2, Search } from "lucide-react";
+import { Building2, Eye, Loader, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -43,7 +43,7 @@ const Companies = () => {
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader className="animate-spin" />
       </div>
     );
   }

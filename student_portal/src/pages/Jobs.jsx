@@ -43,7 +43,7 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
       application.currentStatus !== "rejected",
     interview: (application) =>
       application.job.status === "INTERVIEW" &&
-      ["shortlisted", "waitlist"].includes(application.currentStatus),
+      ["interview"].includes(application.currentStatus),
     rejected: (application) => application.currentStatus === "rejected",
     selected: (application) =>
       application.currentStatus === "selected" &&
@@ -59,13 +59,30 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
           const response = await fetch("/api/jobs/status/open");
           const data = await response.json();
           setJobs(data.data);
-          console.log("open");
+          // console.log("open");
+          // console.log(
+          //   "-----------",
+          //   window.location,
+          //   window.location.pathname.split("/")[2]
+          // );
+          // console.log(
+          //   data,
+          //   data.data.find(
+          //     (job) => job.jobId === window.location.pathname.split("/")[2]
+          //   )
+          // );
+          if (window.location.pathname.split("/")[2])
+            setSelectedJob(
+              data.data.find(
+                (job) => job.jobId === window.location.pathname.split("/")[2]
+              )
+            );
           return;
         }
         console.log("in");
         const response = await fetch("/api/jobs/myjobs");
         const data = await response.json();
-
+        console.log(data);
         // Filter jobs based on current mode
         const filteredJobs = data.data
           .filter(modeFilters[mode])
@@ -127,9 +144,9 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
   // Job Selection Handler
   const handleJobSelect = (job) => {
     setSelectedJob(job);
-    if (window.innerWidth < 640) {
-      navigate(`/jobs/${job.jobId}`);
-    }
+    // if (window.innerWidth < 640) {
+    navigate(`/${window.location.pathname.split("/")[1]}/${job.jobId}`);
+    // }
   };
 
   // Apply Job Handler
@@ -247,7 +264,7 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
     <div className="bg-gray-50 dark:bg-gray-900 h-screen p-4 overflow-hidden">
       <div className="flex h-full gap-4 relative">
         {/* Mobile Close Button */}
-        {window.innerWidth < 640 && onClose && (
+        {/* {window.innerWidth < 640 && (
           <Button
             variant="ghost"
             size="icon"
@@ -256,10 +273,13 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
           >
             <X className="h-6 w-6" />
           </Button>
-        )}
+        )} */}
 
         {/* Job List */}
-        <Card className="sm:w-1/3 flex flex-col overflow-hidden">
+        <Card
+          className={`sm:w-1/3 flex flex-col overflow-hidden 
+            ${window.innerWidth < 640 && selectedJob ? "hidden" : ""}`}
+        >
           <div className="p-4 flex space-x-2 flex-shrink-0">
             <div className="relative flex-1">
               <Input
@@ -354,9 +374,19 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
           className={`sm:w-2/3 flex flex-col 
             ${window.innerWidth < 640 && !selectedJob ? "hidden" : ""}`}
         >
-          {selectedJob && (
-            <CardHeader className="flex-row justify-between items-center">
-              <CardTitle>Job Details</CardTitle>
+          {window.innerWidth < 640 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-0 right-0 z-10"
+              onClick={() => setSelectedJob(null)}
+            >
+              <X className="h-6 w-6" />
+            </Button>
+          )}
+          <CardHeader className="flex-row justify-between items-center">
+            <CardTitle>Job Details</CardTitle>
+            {selectedJob && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm">
@@ -368,8 +398,8 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
                   <DropdownMenuItem>Download Excel</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </CardHeader>
-          )}
+            )}
+          </CardHeader>
           <CardContent className="flex-1 flex flex-col">
             {selectedJob ? (
               <div className="flex-1 flex flex-col">
@@ -377,6 +407,7 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
                   {/* Job Header */}
                   <div className="flex justify-between items-start mb-4">
                     <div>
+                      ();
                       <h2 className="text-2xl font-bold">{selectedJob.role}</h2>
                       <Link
                         to={`/companies/${selectedJob.companyId}`}
