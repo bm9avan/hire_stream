@@ -33,4 +33,5 @@ const safetySettings = [
 export const chatSession = model.startChat({
   generationConfig,
   safetySettings,
+  history: [],
 });

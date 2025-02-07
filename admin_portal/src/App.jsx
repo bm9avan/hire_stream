@@ -16,6 +16,7 @@ import SignUp from "./pages/SignUp";
 import User from "./pages/User";
 import Verification from "./pages/Verification";
 import Company from "./pages/Company";
+import Upload from "./pages/UploadData";
 
 export default function App() {
   const { currentUser: user } = useSelector((state) => state.user);
@@ -68,8 +69,8 @@ export default function App() {
                 path="companies"
                 element={<Companies userRole={user.role} />}
               >
-                <Route path=":companyId" element={<Company />} />
               </Route>
+                <Route path="/companies/:companyId" element={<Company />} />
 
               <Route path="forms" element={<AdminRoute />}>
                 <Route path="" element={<Forms />} />
@@ -79,6 +80,7 @@ export default function App() {
               <Route path="/verify" element={<Verification verify={true} />} />
               {/* need to make true verification status */}
               <Route path="/team" element={<Verification verify={false} />} />
+              <Route path="/upload" element={<Upload />} />
             </Route>
             <Route
               path="/user"

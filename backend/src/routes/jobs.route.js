@@ -15,6 +15,7 @@ import {
   rejectApplication,
   updateJob,
   UpdateJobStatus,
+  voteJob,
   withdrawApplication,
 } from "../controllers/jobs.controller.js";
 import upload from "../middleware/multer.js";
@@ -30,6 +31,7 @@ router.get("/", getJobs);
 router.post("/", verifyAdmin, upload.single("jdPdf"), addJob);
 router.get("/myjobs", verifyToken, getMyJobs);
 router.get("/:jobId", getJob);
+router.post("/:jobId/vote", verifyToken, voteJob);
 
 router.get("/status/open", getOpenJobs);
 router.get("/status/oa", getOaJobs);

@@ -10,12 +10,46 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const Company = () => {
   const { companyId } = useParams(); // Get the company ID from URL params
   const [companyData, setCompanyData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [q, setQ] = useState(null);
+  const [qload, setQload] = useState(false);
+  const [users, setUsers] = useState(null);
+  const handleAddQuestion = async () => {
+    if (!q || q.trim() === "") {
+      return;
+    }
+    setQload(true);
+    try {
+      const response = await fetch(`/api/companies/questions/${companyId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: q,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to add question");
+      }
+      const data = await response.json();
+      console.log(data);
+
+      setCompanyData(data.data);
+      setQ(null);
+      setQload(false);
+    } catch (err) {
+      setError(err.message || "An unknown error occurred");
+      setQload(false);
+    }
+  };
 
   useEffect(() => {
     const fetchCompanyDetails = async () => {
@@ -27,8 +61,9 @@ const Company = () => {
         const data = await response.json();
         console.log(data);
 
-        setCompanyData(data.data);
+        setCompanyData(data.data.company);
         console.log(companyData);
+        setUsers(data.data.users);
 
         setIsLoading(false);
       } catch (err) {
@@ -85,14 +120,10 @@ const Company = () => {
           />
         )}
         <div>
+          <Badge variant="secondary">{companyData.companyId}</Badge>
           <h1 className="text-3xl font-bold text-foreground mb-2">
             {companyData.name}
           </h1>
-          {companyData.description && (
-            <p className="text-muted-foreground max-w-2xl">
-              {companyData.description}
-            </p>
-          )}
         </div>
       </div>
 
@@ -104,8 +135,11 @@ const Company = () => {
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <p className="text-muted-foreground">{companyData.name}</p>
-              <Badge variant="secondary">Company ID</Badge>
+              {companyData.description && (
+                <p className="text-muted-foreground max-w-2xl">
+                  {companyData.description}
+                </p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -119,10 +153,29 @@ const Company = () => {
         <CardContent>
           <Accordion type="single" collapsible className="w-full">
             {console.log(companyData.questions)}
-            {companyData.questions.map((question) => (
-              <AccordionItem key={question.id} value={question.id}>
-                <AccordionTrigger>{question}</AccordionTrigger>
-                {/* <AccordionContent>{question.fullText}</AccordionContent> */}
+            <div className="flex space-x-2 flex-shrink-0">
+              <div className="relative flex-1">
+                <Input
+                  placeholder="Enter a question asked in interview..."
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+              <Button onClick={handleAddQuestion} disabled={qload}>
+                {qload ? "Adding..." : "Add Question"}
+              </Button>
+            </div>
+            {companyData.questions?.map((question, i) => (
+              <AccordionItem
+                key={i}
+                value={i}
+                className="flex space-x-2 p-2 flex-shrink-0"
+              >
+                <div className="relative flex-1 px-4">{question}</div>
+                {/* <Button onClick={handleAddQuestion} variant="secondary">
+                  Ask AI
+                </Button> */}
               </AccordionItem>
             ))}
           </Accordion>

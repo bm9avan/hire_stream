@@ -22,6 +22,7 @@ const User = ({ user: userMe }) => {
       fetch(`/api/user/${userId}`)
         .then((res) => res.json())
         .then((data) => {
+          console.log(data);
           setUser(data);
           setLoading(false);
         })

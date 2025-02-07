@@ -66,6 +66,10 @@ export function AppSidebar({ user, ...props }) {
             url: "/jobs",
           },
           {
+            title: "Webinar Requested",
+            url: "/jobs?tab=webinar",
+          },
+          {
             title: "Post Job",
             url: "/forms/job",
           },
@@ -90,17 +94,17 @@ export function AppSidebar({ user, ...props }) {
 
     projects: [
       {
-        name: "Design Engineering",
+        name: "Privacy Policy",
         url: "#",
         icon: Frame,
       },
       {
-        name: "Sales & Marketing",
+        name: "Terms & Conditions",
         url: "#",
         icon: PieChart,
       },
       {
-        name: "Travel",
+        name: "Cookie Policy",
         url: "#",
         icon: Map,
       },

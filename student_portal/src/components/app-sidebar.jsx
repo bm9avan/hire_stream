@@ -123,7 +123,7 @@ export function AppSidebar({ user, ...props }) {
         icon: Gift,
         items: [
           {
-            title: "View Offers",
+            title: "Rejected Offers",
             url: "/rejected",
           },
           {
@@ -136,17 +136,17 @@ export function AppSidebar({ user, ...props }) {
 
     projects: [
       {
-        name: "Design Engineering",
+        name: "Privacy Policy",
         url: "#",
         icon: Frame,
       },
       {
-        name: "Sales & Marketing",
+        name: "Terms & Conditions",
         url: "#",
         icon: PieChart,
       },
       {
-        name: "Travel",
+        name: "Cookie Policy",
         url: "#",
         icon: Map,
       },

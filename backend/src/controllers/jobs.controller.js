@@ -32,11 +32,15 @@ export const addJob = async (req, res) => {
       skills,
       jobType,
       status = "open",
+      branches,
+      batch,
+      cgpa,
       jdPdfLink,
+      lpa,
       jdPdf,
       jobId,
     } = req.body;
-
+    console.log("test body from job controller", req.body);
     let attachmentUrl = null;
     console.log(collegeId);
     // Handle job attachment file upload
@@ -65,6 +69,10 @@ export const addJob = async (req, res) => {
         deadline,
         skills,
         jobType,
+        branches,
+        batch,
+        cgpa,
+        lpa,
         status: status.toUpperCase(),
         jdPdfLink: attachmentUrl,
         jobId: jobId || generateJobId(),
@@ -283,6 +291,45 @@ export const getJob = async (req, res) => {
   }
 };
 
+export const voteJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const { uid } = req.user;
+    const job = await db
+      .select()
+      .from(jobs)
+      .where(eq(jobs.jobId, jobId))
+      .limit(1);
+
+    if (!job.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Job not found",
+      });
+    }
+
+    const responce = await db
+      .update(jobs)
+      .set({ webinarRequested: +job[0].webinarRequested + 1 })
+      .where(eq(jobs.jobId, jobId))
+      .returning();
+    console.log("-----object=-", job, responce);
+
+    res.status(200).json({
+      success: true,
+      message: "Job voted successfully",
+      data: responce[0],
+    });
+  } catch (error) {
+    console.error("Error voting job:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error voting job",
+      error: error.message,
+    });
+  }
+};
+
 export const deleteJob = async (req, res) => {
   try {
     const { jobId } = req.params;
@@ -397,7 +444,14 @@ export const appliedJobs = async (req, res) => {
     const appliedJobs = await db.query.applications.findMany({
       where: (table, fn) => fn.eq(table.jobId, jobId),
       with: {
-        user: { columns: { name: true, branchId: true, profileImageUrl: true, uid: true } },
+        user: {
+          columns: {
+            name: true,
+            branchId: true,
+            profileImageUrl: true,
+            uid: true,
+          },
+        },
       },
     });
     console.log(appliedJobs);
@@ -457,13 +511,15 @@ export const acceptApplication = async (req, res, next) => {
   try {
     const { jobId } = req.params;
     const { uids, status } = req.body;
-    await db
+    const response = await db
       .update(applications)
       .set({ currentStatus: status })
       .where(
         and(eq(applications.jobId, jobId), inArray(applications.uid, uids))
       )
       .execute();
+    // .returning({ userId: applications.uid });
+    console.log(response);
     const appliedJobs = await db.query.applications.findMany({
       where: (table, fn) => fn.eq(table.jobId, jobId),
       with: {

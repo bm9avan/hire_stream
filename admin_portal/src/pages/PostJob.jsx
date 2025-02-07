@@ -345,8 +345,13 @@ const JobForm = ({ user }) => {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="package">Package</Label>
-                <Input id="package" type="text" placeholder="in terms of lpa" />
+                <Label htmlFor="lpa">Package</Label>
+                <Input
+                  id="lpa"
+                  type="number"
+                  placeholder="in terms of lpa"
+                  {...register("batch", { required: "Batch is required" })}
+                />
               </div>
 
               <div className="space-y-2">

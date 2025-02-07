@@ -106,7 +106,7 @@ const Companies = () => {
 
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-lg truncate">
-                        {company.name}
+                        {company.name.toUpperCase()}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
                         {company.description}

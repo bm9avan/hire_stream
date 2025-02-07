@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 
 const jobStatus = {
@@ -94,11 +94,18 @@ const JobManagement = () => {
   const [jobToDelete, setJobToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc"); // 'asc' or 'desc'
-  const [isMobileJobDetailView, setIsMobileJobDetailView] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("set selcted users", selectedApplications);
+  const location = useLocation();
+  const [tab, setTab] = useState("");
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get("tab") === "webinar") {
+      setStatus("open");
+    }
+    setTab(urlParams.get("tab"));
+  }, [location.search]);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -345,6 +352,79 @@ const JobManagement = () => {
   };
 
   const icon = jobStatus[status];
+
+  console.log(filteredAndSortedJobs);
+  if (tab === "webinar") {
+    // setStatus("open");
+
+    let filteredJobs = jobs;
+
+    // Advanced Search request
+    filteredJobs = filteredJobs.filter((job) => {
+      // Convert webinarRequested to number and check if greater than 0
+      const webinarCount = parseInt(job.webinarRequested);
+      return webinarCount > 0;
+    });
+
+    // Sorting by request
+    const sortedJobs = filteredJobs.sort((a, b) => {
+      const webinarCountA = parseInt(a.webinarRequested);
+      const webinarCountB = parseInt(b.webinarRequested);
+      return webinarCountB - webinarCountA;
+    });
+
+    return (
+      <div className="bg-gray-50 dark:bg-gray-900 h-screen p-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center p-4">
+            <span className="text-muted-foreground">Loading Requests...</span>
+          </div>
+        ) : (
+          <div className="divide-y">
+            {sortedJobs.map((job) => (
+              <div
+                key={job.jobId}
+                className={`p-4 cursor-pointer hover:bg-accent transition-colors ${
+                  selectedJob?.jobId === job.jobId
+                    ? "bg-primary/10 border-l-4 border-primary"
+                    : ""
+                }`}
+                onClick={() => handleJobSelect(job)}
+              >
+                <div className="flex justify-around items-start">
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-semibold">{job.role}</h3>
+                      <Badge
+                        variant="outline"
+                        className={`${
+                          jobTypeConfig[job.jobType]?.color
+                        } text-2xl`}
+                      >
+                        {job.webinarRequested}
+                      </Badge>
+                    </div>
+                    <Link
+                      to={`/companies/${job.companyId}`}
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {job.company.name}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {filteredAndSortedJobs.length === 0 && (
+              <div className="flex items-center justify-center p-4">
+                <span className="text-muted-foreground">No Requests found</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-50 dark:bg-gray-900 h-screen p-4 overflow-hidden">
       <div className="flex h-full gap-4 relative">
@@ -419,9 +499,9 @@ const JobManagement = () => {
               <div className="divide-y">
                 {filteredAndSortedJobs.map((job) => (
                   <div
-                    key={job.id}
+                    key={job.jobId}
                     className={`p-4 cursor-pointer hover:bg-accent transition-colors ${
-                      selectedJob?.id === job.id
+                      selectedJob?.jobId === job.jobId
                         ? "bg-primary/10 border-l-4 border-primary"
                         : ""
                     }`}

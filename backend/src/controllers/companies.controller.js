@@ -1,6 +1,13 @@
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import db from "../db/index.js";
-import { companies } from "../db/schema.js";
+import {
+  applications,
+  branches,
+  colleges,
+  companies,
+  jobs,
+  users,
+} from "../db/schema.js";
 import { cloudinaryUpload, cloudinaryDestroy } from "../utils/cloudinary.js";
 
 // Helper function to extract public ID from Cloudinary URL
@@ -54,6 +61,7 @@ export const addCompany = async (req, res) => {
         name,
         description,
         logoUrl: finalLogoUrl,
+        questions: [],
       })
       .returning();
 
@@ -179,6 +187,44 @@ export const getCompany = async (req, res) => {
       .limit(1);
 
     // const company = await db.query.companies.findFirst({where:(table, fn)=> fn.eq(table.companyId, id), with:{q}})
+    const selectedStudents = await db
+      .select({
+        uid: users.uid,
+        name: users.name,
+        userProfileImg: users.profileImageUrl,
+        batch: users.batch,
+        selectedJobs: sql`json_agg(
+          json_build_object(
+            'jobId', ${jobs.jobId}, 
+            'role', ${jobs.role}
+          )
+        )`,
+      })
+      .from(applications)
+      .innerJoin(jobs, eq(applications.jobId, jobs.jobId))
+      .innerJoin(users, eq(applications.uid, users.uid))
+      .innerJoin(colleges, eq(users.collegeId, colleges.collegeId))
+      .leftJoin(branches, eq(users.branchId, branches.branchId))
+      .where(
+        and(
+          eq(jobs.companyId, id),
+          eq(jobs.status, "CLOSED"),
+          eq(applications.currentStatus, "selected")
+        )
+      )
+      .groupBy(
+        users.uid,
+        users.name,
+        users.email,
+        users.phoneNo,
+        users.cgpa,
+        users.resumeLink,
+        colleges.name,
+        branches.name
+      )
+      .orderBy(users.name);
+
+    console.log("object----", selectedStudents);
 
     if (!company.length) {
       return res.status(404).json({
@@ -189,7 +235,7 @@ export const getCompany = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: company[0],
+      data: { company: company[0], palced: selectedStudents },
     });
   } catch (error) {
     console.error("Error fetching company:", error);
@@ -239,6 +285,37 @@ export const deleteCompany = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error deleting company",
+      error: error.message,
+    });
+  }
+};
+
+export const addQuestion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { question } = req.body;
+    const response = await db
+      .select({ questions: companies.questions })
+      .from(companies)
+      .where(eq(companies.companyId, id));
+    const oldQuestion = response[0].questions;
+    console.log(oldQuestion);
+
+    const newQuestion = await db
+      .update(companies)
+      .set({ questions: [question, ...oldQuestion] })
+      .where(eq(companies.companyId, id))
+      .returning();
+    res.status(200).json({
+      success: true,
+      message: "Question added successfully",
+      data: newQuestion,
+    });
+  } catch (error) {
+    console.error("Error adding question:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error adding question",
       error: error.message,
     });
   }

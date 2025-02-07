@@ -67,9 +67,13 @@ const UserCard = ({ user, isMe = false }) => {
                   <span className="font-medium capitalize text-sm text-muted-foreground">
                     EMAIL
                   </span>
-                  <span className="text-sm text-accent-foreground break-words">
+                  <a
+                    target="_blank"
+                    href={`mailto:${user.email}`}
+                    className="text-sm text-accent-foreground break-words"
+                  >
                     {user.email}
-                  </span>
+                  </a>
                 </div>
               )}
 
@@ -78,9 +82,13 @@ const UserCard = ({ user, isMe = false }) => {
                   <span className="font-medium capitalize text-sm text-muted-foreground">
                     PHONE NUMBER
                   </span>
-                  <span className="text-sm text-accent-foreground break-words">
+                  <a
+                    target="_blank"
+                    href={`https://wa.me/${user.phoneNo}`}
+                    className="text-sm text-accent-foreground break-words"
+                  >
                     {user.phoneNo}
-                  </span>
+                  </a>
                 </div>
               )}
 

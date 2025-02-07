@@ -404,8 +404,9 @@ export const getUsers = async (req, res, next) => {
 
 export const getUser = async (req, res, next) => {
   try {
+    console.log("req");
     const user = await db.query.users.findFirst({
-      where: (table, fn) => fn.eq(table.uid, req.user.uid),
+      where: (table, fn) => fn.eq(table.uid, req.params.userId),
       with: {
         college: { description: false },
         branch: { description: false },

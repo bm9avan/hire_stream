@@ -28,6 +28,7 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [mockLoader, setMockLoader] = useState(false);
+  const [voteLoader, setVoteLoader] = useState(null);
   const navigate = useNavigate();
 
   // Mapping of modes to filtering logic
@@ -144,6 +145,7 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
   // Job Selection Handler
   const handleJobSelect = (job) => {
     setSelectedJob(job);
+    setVoteLoader(null);
     // if (window.innerWidth < 640) {
     navigate(`/${window.location.pathname.split("/")[1]}/${job.jobId}`);
     // }
@@ -260,6 +262,40 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
     }
   };
 
+  console.log("voteLoader", voteLoader);
+  const handleVote = async () => {
+    try {
+      setVoteLoader("Voting...");
+      const response = await fetch(`/api/jobs/${selectedJob.jobId}/vote`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (data.success) {
+        console.log(data.data, data.data.webinarRequested);
+        setVoteLoader(`${data.data.webinarRequested} Votes for Webinar`);
+        toast({
+          title: "Success",
+          description: "Voted for Webinar",
+          variant: "success",
+        });
+      } else {
+        setVoteLoader(null);
+        toast({
+          title: "Error",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error voting:", error);
+      toast({
+        title: "Error",
+        description: "Failed to vote",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="bg-gray-50 dark:bg-gray-900 h-screen p-4 overflow-hidden">
       <div className="flex h-full gap-4 relative">
@@ -324,7 +360,7 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
                   <div
                     key={job.id}
                     className={`p-4 cursor-pointer hover:bg-accent transition-colors ${
-                      selectedJob?.id === job.id
+                      selectedJob?.jobId === job.jobId
                         ? "bg-primary/10 border-l-4 border-primary"
                         : ""
                     }`}
@@ -386,19 +422,6 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
           )}
           <CardHeader className="flex-row justify-between items-center">
             <CardTitle>Job Details</CardTitle>
-            {selectedJob && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>Generate Poster</DropdownMenuItem>
-                  <DropdownMenuItem>Download Excel</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
           </CardHeader>
           <CardContent className="flex-1 flex flex-col">
             {selectedJob ? (
@@ -407,7 +430,6 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
                   {/* Job Header */}
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      ();
                       <h2 className="text-2xl font-bold">{selectedJob.role}</h2>
                       <Link
                         to={`/companies/${selectedJob.companyId}`}
@@ -426,6 +448,7 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
                           : "Create Mock interview"}
                       </Button>
                     </div>
+
                     <Badge
                       variant="outline"
                       className={`${
@@ -464,6 +487,22 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
                     </div>
                   </div>
 
+                  {/* Branches */}
+                  <div className="mb-4">
+                    <h3 className="font-semibold mb-2">Branches</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedJob.branches.split(",").map((branche, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="text-xs"
+                        >
+                          {branche.trim()}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Description */}
                   <div className="mb-4">
                     <h3 className="font-semibold mb-2">Description</h3>
@@ -478,6 +517,12 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
                       <h3 className="font-semibold">Deadline</h3>
                       <p className="text-sm text-muted-foreground">
                         {new Date(selectedJob.deadline).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Package</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedJob.lpa} LPA
                       </p>
                     </div>
                     <div>
@@ -526,6 +571,15 @@ const JobManagement = ({ mode = "open", userCgpa, onClose }) => {
                       Job Description
                     </Button>
                   )}
+                  <div>
+                    <Button
+                      disabled={voteLoader}
+                      onClick={handleVote}
+                      variant="destructive"
+                    >
+                      {voteLoader ? voteLoader : "Vote for Webinar"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             ) : (

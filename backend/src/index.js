@@ -26,6 +26,6 @@ app.use("/api/companies", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/mockinterview", mockInterviewRoutes);
 
-app.listen(8080, () => {
+app.listen(8000, () => {
   console.log("Server is running on http://localhost:8080");
 });

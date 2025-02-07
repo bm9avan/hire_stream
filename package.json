@@ -6,7 +6,7 @@
   "scripts": {
     "in": "npm install --prefix student_portal && npm install --prefix admin_portal && npm install --prefix backend",
     "start": "concurrently \"npm start --prefix student_portal\" \"npm start --prefix admin_portal\" \"npm start --prefix backend\"",
-    "dev": "concurrently \"npm run dev --prefix admin_portal\" \"npm run dev --prefix backend\""
+    "dev": "concurrently \"npm run dev --prefix student_portal\" \"npm run dev --prefix admin_portal\" \"npm run dev --prefix backend\""
   },
   "devDependencies": {
     "concurrently": "^9.0.1"

@@ -4,13 +4,13 @@ import {
   boolean,
   date,
   jsonb,
+  numeric,
   // pgEnum,
   pgTable,
   real,
-  serial,
   text,
   uuid,
-  varchar
+  varchar,
 } from "drizzle-orm/pg-core";
 
 // // Enums
@@ -85,7 +85,8 @@ export const colleges = pgTable("colleges", {
 // });
 
 export const companies = pgTable("companies", {
-  id: serial("id").primaryKey(),
+  // id: serial("id").primaryKey(),
+  // id: uuid("id").defaultRandom().primaryKey().notNull(),
   companyId: varchar("company_id", { length: 20 }).unique().notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
@@ -94,7 +95,8 @@ export const companies = pgTable("companies", {
 });
 
 export const resumes = pgTable("resumes", {
-  id: serial("id").primaryKey(),
+  // id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   uid: varchar("uid", { length: 20 })
     .notNull()
     .references(() => users.uid),
@@ -103,7 +105,8 @@ export const resumes = pgTable("resumes", {
 });
 
 export const reviews = pgTable("reviews", {
-  id: serial("id").primaryKey(),
+  // id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   collegeId: varchar("college_id", { length: 20 })
     .notNull()
     .references(() => colleges.collegeId),
@@ -118,7 +121,7 @@ export const reviews = pgTable("reviews", {
 });
 
 export const jobs = pgTable("jobs", {
-  id: serial("id").primaryKey(),
+  // id: serial("id").primaryKey(),
   jobId: varchar("job_id", { length: 20 }).unique().notNull(),
   collegeId: varchar("college_id", { length: 20 })
     .notNull()
@@ -137,11 +140,13 @@ export const jobs = pgTable("jobs", {
   statusDate: date("status_date"), //date of event, for open jobs we tell apply deadline, for online-assessment we tell date of online assessment, for interview we tell date of interview. if those values are null, the date of perticuler status yet to announce
   branches: varchar("branches", { length: 1024 }),
   createdAt: date("created_at").defaultNow(),
+  webinarRequested: numeric("webinar_requested").default(0),
   cgpa: real("cgpa"),
+  lpa: real("lpa"),
 });
 
 export const applications = pgTable("applications", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   jobId: varchar("job_id", { length: 20 })
     .notNull()
     .references(() => jobs.jobId, { onDelete: "cascade" }),
@@ -156,7 +161,7 @@ export const applications = pgTable("applications", {
 });
 
 export const mockInterview = pgTable("mockInterview", {
-  id: uuid("id").primaryKey().defaultRandom().primaryKey().notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   jsonMockResp: jsonb("jsonMockResp").notNull(),
   jobId: varchar("job_id", { length: 20 })
     .notNull()
@@ -168,7 +173,7 @@ export const mockInterview = pgTable("mockInterview", {
 });
 
 export const userAnswer = pgTable("userAnswer", {
-  id: uuid("id").primaryKey().defaultRandom().primaryKey().notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   mockId: uuid("mock_id")
     .notNull()
     .references(() => mockInterview.id, { onDelete: "cascade" }),
