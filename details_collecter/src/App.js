@@ -66,7 +66,7 @@ const App = () => {
           submissionData.append(key, formData[key]);
         }
       }
-      const res = await fetch("http://localhost:8080/api/auth/details", {
+      const res = await fetch("https://hire-stream-bmpavan.vercel.app/api/auth/details", {
         method: "POST",
         body: submissionData,
       });
