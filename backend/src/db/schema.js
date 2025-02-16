@@ -55,6 +55,7 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url", { length: 1024 }).default(
     "https://cdn-icons-png.flaticon.com/512/9512/9512683.png"
   ),
+  companies: jsonb("companies", { length: 1024 }),
 });
 
 export const branches = pgTable("branches", {

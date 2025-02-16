@@ -19,6 +19,7 @@ const App = () => {
   const [error, setError] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [sucess, setSucess] = useState(false);
+  console.log(formData);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -66,15 +67,18 @@ const App = () => {
           submissionData.append(key, formData[key]);
         }
       }
-      const res = await fetch("https://hire-stream-bmpavan.vercel.app/api/auth/details", {
-        method: "POST",
-        body: submissionData,
-      });
-      console.log(res);
+      const res = await fetch(
+        "http://localhost:8080/api/auth/details",
+        {
+          method: "POST",
+          body: submissionData,
+        }
+      );
+      console.log(res, res.error);
       if (res.ok) setSucess(true);
       const data = await res.json();
       console.log(data);
-      if(!res.ok) setError(data.error)
+      if (!res.ok) setError(data.error);
       console.log("Form submitted successfully!");
     } catch (err) {
       console.error(err);

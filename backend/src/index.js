@@ -15,7 +15,6 @@ dotenv.config();
 
 app.use(express.json());
 app.use(cookiesParser());
-console.log(process.env.FRONTEND_URL);
 app.use(cors());
 
 app.get("/", (req, res) => {

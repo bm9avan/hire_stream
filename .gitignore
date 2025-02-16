@@ -13,7 +13,7 @@
 
 # Ignore any temporary files or directories
 **/tmp/
-**/temp/
+# **/temp/
 
 # Ignore any user-specific or OS-specific files
 .DS_Store
