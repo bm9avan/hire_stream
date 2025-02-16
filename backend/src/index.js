@@ -8,12 +8,15 @@ import companyRoutes from "./routes/companies.route.js";
 import jobRoutes from "./routes/jobs.route.js";
 import userRoutes from "./routes/user.route.js";
 import mockInterviewRoutes from "./routes/mockInterview.route.js";
+import cors from "cors";
 
 const app = express();
 dotenv.config();
 
 app.use(express.json());
 app.use(cookiesParser());
+console.log(process.env.FRONTEND_URL);
+app.use(cors());
 
 app.get("/", (req, res) => {
   return res.send("Hello, World!");
@@ -26,6 +29,6 @@ app.use("/api/companies", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/mockinterview", mockInterviewRoutes);
 
-app.listen(8000, () => {
+app.listen(8080, () => {
   console.log("Server is running on http://localhost:8080");
 });

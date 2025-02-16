@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import db from "../db/index.js";
 import { branches, colleges, users } from "../db/schema.js";
 import { errorHandler } from "../utils/error.js";
+import { cloudinaryUpload } from "../utils/cloudinary.js";
+import fs from "fs";
 
 export const signup = async (req, res, next) => {
   const {
@@ -17,6 +19,7 @@ export const signup = async (req, res, next) => {
     branchId,
     profileImageUrl,
     role,
+    isit,
     ...others
   } = req.body;
   console.log(req.body);
@@ -36,12 +39,12 @@ export const signup = async (req, res, next) => {
     collegeId === ""
   ) {
     console.log(uid, name, email, password, dob, collegeId);
-    return next(errorHandler(400, "All required fields must be filled"));
+    return next(errorHandler(400, "All required fields must be filled", res));
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return next(errorHandler(400, "Invalid email format"));
+    return next(errorHandler(400, "Invalid email format",res));
   }
 
   const userRoleRegex =
@@ -64,7 +67,7 @@ export const signup = async (req, res, next) => {
   }
 
   if (!userRoleRegex.test(userRole)) {
-    return next(errorHandler(400, "Invalid user role"));
+    return next(errorHandler(400, "Invalid user role", res));
   }
 
   try {
@@ -74,7 +77,7 @@ export const signup = async (req, res, next) => {
     });
     console.log(existingEmail);
     if (existingEmail) {
-      return next(errorHandler(400, "Email already exists"));
+      return next(errorHandler(400, "Email already exists", res));
     }
 
     // Hash the password
@@ -117,7 +120,7 @@ export const signup = async (req, res, next) => {
     // });
     if (!userCreated[0]) {
       return next(
-        errorHandler(404, "Error Signing up, please try signing in again")
+        errorHandler(404, "Error Signing up, please try signing in again", res)
       );
     }
     const { password: pass, ...rest } = userCreated[0];
@@ -134,18 +137,29 @@ export const signup = async (req, res, next) => {
     //   branchId,
     //   createdAt: new Date(),
     // });
-    console.log(rest);
-    res
-      .status(200)
-      .cookie("access_token", token, {
-        httpOnly: true,
-        maxAge: 365 * 24 * 60 * 60 * 1000,
-      })
-      .json(rest);
+    console.log(rest, "isit", isit);
+    if (isit) {
+      console.log("inside the isit");
+      res.status(200).json({ message: "User created successfully", ...rest });
+      return;
+    } else {
+      res
+        .status(200)
+        .cookie("access_token", token, {
+          httpOnly: true,
+          maxAge: 365 * 24 * 60 * 60 * 1000,
+        })
+        .json(rest);
+    }
 
     // res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    next(errorHandler(500, error.message));
+    console.log("inside signup", error.message);
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
+    // next(errorHandler(500, error.message));
   }
 };
 
@@ -260,5 +274,29 @@ export const google = async (req, res, next) => {
     }
   } catch (error) {
     next(error);
+  }
+};
+
+export const addDetails = async (req, res, next) => {
+  try {
+    req.body.collegeId = "bit";
+    req.body.branchId = "ise";
+    req.body.role = "student";
+    req.body.verified = true;
+    req.body.batch = 2025;
+    req.body.isit = true;
+    console.log(Date.now(), req.body, req.file);
+    const responce = await cloudinaryUpload(req.file.path);
+    console.log(responce);
+    req.body.profileImageUrl = responce.url;
+    fs.unlinkSync(req.file.path);
+
+    return signup(req, res, next);
+  } catch (error) {
+    console.log(Date.now(), "object creation details", error);
+    return res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
   }
 };

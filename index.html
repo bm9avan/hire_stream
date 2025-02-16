@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+      .container {
+        max-width: 500px;
+        width: 90%;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      /* #signupForm { */
+      /* display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 15px; */
+      /* } */
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        text-align: left;
+        font-weight: bold;
+        display: block;
+      }
+      input,
+      select {
+        width: 96%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .profile-img {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .profile-img img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ccc;
+        margin-bottom: 10px;
+      }
+      .add-company {
+        display: block;
+        background: #007bff;
+        color: white;
+        padding: 8px;
+        margin: 8px;
+        text-align: center;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .remove-company {
+        background: #dc3545;
+        color: white;
+        padding: 5px;
+        text-align: center;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 5px;
+        display: inline-block;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #218838;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 style="text-align: center">Enter Your Details</h2>
+
+      <form id="signupForm">
+        <!-- Profile Image Upload -->
+        <div class="form-group profile-img">
+          <label for="profileImage">Profile Image</label>
+          <img id="previewImage" alt="Profile Image" hidden />
+          <input type="file" id="profileImage" accept="image/*" required />
+        </div>
+
+        <div class="form-group">
+          <label for="uid">USN</label>
+          <input type="text" id="uid" placeholder="Enter USN" required />
+        </div>
+
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="Enter Name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter Email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNo">Phone Number</label>
+          <input
+            type="number"
+            id="phoneNo"
+            placeholder="Enter Phone Number"
+            min="1000000000"
+            max="9999999999"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="cgpa">CGPA</label>
+          <input
+            type="number"
+            id="cgpa"
+            placeholder="Enter CGPA"
+            step="0.01"
+            min="0"
+            max="10"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter Password"
+            minlength="6"
+            required
+          />
+        </div>
+
+        <!-- Add Company Section -->
+        <h3>Placement Details</h3>
+        <div id="companies"></div>
+        <div class="add-company" onclick="addCompany()">+ Add Company</div>
+
+        <div id="error" hidden></div>
+
+        <!-- Submit Button -->
+        <button>Submit</button>
+      </form>
+    </div>
+
+    <script>
+      let c = 0;
+      let file = null;
+      document
+        .getElementById("profileImage")
+        .addEventListener("change", function (event) {
+          if (event.target.files[0]) {
+            file = event.target.files[0];
+          }
+          console.log("file", file);
+          if (file) {
+            document.getElementById("previewImage").hidden = false;
+            document.getElementById("profileImage").required = false;
+            document.getElementById("previewImage").src =
+              URL.createObjectURL(file);
+          }
+        });
+
+      document
+        .getElementById("signupForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          try {
+            console.log(event.target, event);
+            // Add your form submission logic here
+            document.getElementById("error").hidden = true;
+            let formData = new FormData();
+
+            console.log(
+              document.getElementById("previewImage").hidden,
+              document.getElementById("previewImage"),
+              formData
+            );
+            formData.append("name", document.getElementById("name").value);
+            formData.append("uid", document.getElementById("uid").value);
+            formData.append("email", document.getElementById("email").value);
+            formData.append(
+              "phoneNo",
+              document.getElementById("phoneNo").value
+            );
+            formData.append("cgpa", document.getElementById("cgpa").value);
+            formData.append("dob", document.getElementById("dob").value);
+            formData.append(
+              "password",
+              document.getElementById("password").value
+            );
+
+            let companies = [];
+            for (let i = 0; i < c; i++) {
+              let company = document.getElementById("company" + (i + 1)).value;
+              let jobType = document.getElementById("jobType" + (i + 1)).value;
+              let package = document.getElementById("package" + (i + 1)).value;
+
+              companies.push({ company, jobType, package });
+            }
+            formData.append("companies", JSON.stringify(companies));
+            console.log(formData, file);
+            formData.append("userimg", file);
+
+            console.log(formData);
+            const res = await fetch("http://localhost:8080/api/auth/details", {
+              method: "POST",
+              body: formData,
+            });
+            console.log(res);
+            if (!res.ok) {
+              throw new Error(`HTTP error! Status: ${res.status}`);
+            }
+
+            // const data = await res.json();
+            // console.log(data);
+          } catch (err) {
+            document.getElementById("error").hidden = false;
+            document.getElementById("error").textContent = err;
+            console.log(err);
+          }
+        });
+
+      function addCompany() {
+        const companyDiv = document.createElement("div");
+        companyDiv.classList.add("form-group");
+        companyDiv.innerHTML = `
+            <label>Company Name ${++c}</label>
+            <input type="text" placeholder="Enter Company Name" id="company${c}" required>
+            
+            <label>Job Type</label>
+            <select required id="jobType${c}">
+                <option value="">Select Type</option>
+                <option value="internship">Internship</option>
+                <option value="fulltime">Full Time</option>
+                <option value="fulltime_internship">Full Time + Internship</option>
+            </select>
+
+            <label>Package (in LPA) or Internship stipend</label>
+            <input type="number" placeholder="Enter Package" step="0.01" min="0" id="package${c}" required>
+
+            <div class="remove-company" onclick="removeCompany(this)">Remove</div>
+        `;
+        document.getElementById("companies").appendChild(companyDiv);
+      }
+
+      function removeCompany(button) {
+        button.parentElement.remove();
+      }
+    </script>
+  </body>
+</html>
