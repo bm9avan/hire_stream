@@ -87,31 +87,31 @@ const StudentForm = () => {
     }
   };
 
-  // if (sucess) {
-  //   return (
-  //     <div className="success-container">
-  //       <div className="success-box">
-  //         <FaCheckCircle className="success-icon" />
-  //         <h2>Thank You for Your Submission!</h2>
-  //         <p>
-  //           This form is an <strong>automatic poster generation</strong> system
-  //           for students selected in college placements.
-  //         </p>
-  //         <p>
-  //           <strong>Why do we collect your password?</strong> In case our
-  //           college placement portal is hosted in the future, you won't need to
-  //           sign up again. You can log in with the same credentials.
-  //         </p>
-  //         <p>
-  //           We truly appreciate your time and effort in submitting the details.
-  //         </p>
-  //         <p>
-  //           <strong>Thanks once again! 🎉</strong>
-  //         </p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (sucess) {
+    return (
+      <div className="success-container">
+        <div className="success-box">
+          <FaCheckCircle className="success-icon" />
+          <h2>Thank You for Your Submission!</h2>
+          <p>
+            This form is an <strong>automatic poster generation</strong> system
+            for students selected in college placements.
+          </p>
+          <p>
+            <strong>Why do we collect your password?</strong> In case our
+            college placement portal is hosted in the future, you won't need to
+            sign up again. You can log in with the same credentials.
+          </p>
+          <p>
+            We truly appreciate your time and effort in submitting the details.
+          </p>
+          <p>
+            <strong>Thanks once again! 🎉</strong>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -119,11 +119,12 @@ const StudentForm = () => {
       <form onSubmit={handleSubmit}>
         {/* Profile Image Upload */}
         <div className="form-group profile-img">
-          <label>Profile Image</label>
+          <label style={{ width: "100%" }}>Profile Image</label>
           <img src={previewImage} alt="Add Profile Below" />
           <input
+            style={{ width: "94%" }}
             type="file"
-            accept="image/*"
+            accept=".jpg, .jpeg, .png"
             onChange={handleFileChange}
             required
           />
@@ -213,7 +214,8 @@ const StudentForm = () => {
         </div>
 
         {/* Placement Details */}
-        <h3>Placement Details</h3>
+        <h3>Placement Details </h3>
+        <h5>(Please enter your placement details by pressing the "+ Add Company" button below.)</h5>
         {formData.companies.map((company, index) => (
           <div className="form-group company" key={index}>
             <label>Company Name</label>
@@ -300,13 +302,13 @@ const PosterGenerator = () => {
     const fetchStudentData = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:8000/api/user/alllist");
+        const response = await fetch("https://hire-stream-backend.onrender.com/api/user/alllist");
         const data = await response.json();
         console.log("Fetched student data:", data);
 
         // Filter ISE students only (USN starts with 1bi21is or 1BI21IS followed by 3 digits)
         const iseStudents = data.users.filter((student) => {
-          const uid = student.uid.toUpperCase();
+          const uid = student.uid.trim().toUpperCase();
           return /^1BI21IS\d{3}$/i.test(uid);
         });
 
@@ -458,9 +460,9 @@ const PosterGenerator = () => {
       company.avgPackage =
         validPackages.length > 0
           ? (
-              validPackages.reduce((sum, pkg) => sum + pkg, 0) /
-              validPackages.length
-            ).toFixed(2)
+            validPackages.reduce((sum, pkg) => sum + pkg, 0) /
+            validPackages.length
+          ).toFixed(2)
           : "N/A";
 
       console.log(
@@ -607,7 +609,7 @@ const PosterGenerator = () => {
                           .map(formatJobType)
                           .join(", ")}
                       </td>
-                      <td>₹{companyData[companyName].avgPackage} LPA</td>
+                      <td>₹{companyData[companyName].avgPackage} {companyData[companyName].jobTypes.includes("fulltime") || companyData[companyName].jobTypes.includes("fulltime_internship") ? "LPA" : ""}</td>
                       <td>
                         <button
                           onClick={() => renderPoster(companyName)}
@@ -656,6 +658,7 @@ const PosterGenerator = () => {
             companyName={companyName}
             jobTitle={formatJobType(companyData[companyName].mostCommonJobType)}
             list={companyData[companyName].students}
+            package={`₹${companyData[companyName].avgPackage} ${companyData[companyName].jobTypes.includes("fulltime") || companyData[companyName].jobTypes.includes("fulltime_internship") ? "LPA" : ""}`}
             baseImageUrl="https://res.cloudinary.com/dw8dsa7ei/image/upload/v1740761538/asnluucipeljgiukb4g9.png"
             formatJobType={formatJobType}
             formatPackage={formatPackage}
@@ -673,6 +676,7 @@ const PosterGenerator = () => {
               companyData[selectedCompany].mostCommonJobType
             )}
             list={companyData[selectedCompany].students}
+            package={`₹${companyData[selectedCompany].avgPackage} ${companyData[selectedCompany].jobTypes.includes("fulltime") || companyData[selectedCompany].jobTypes.includes("fulltime_internship") ? "LPA" : ""}`}
             baseImageUrl="https://res.cloudinary.com/dw8dsa7ei/image/upload/v1740761538/asnluucipeljgiukb4g9.png"
             formatJobType={formatJobType}
             formatPackage={formatPackage}
@@ -690,13 +694,13 @@ const PosterGenerator = () => {
   );
 };
 
-// Enhanced Poster Component
 // Enhanced Poster Component with Borders and Package Display
 const CompanyPoster = ({
   baseImageUrl,
   companyName,
   jobTitle,
   list,
+  package: salary,
   formatJobType,
   formatPackage,
   canvasRef,
@@ -766,7 +770,7 @@ const CompanyPoster = ({
 
         context.font = "italic 24px Arial";
         context.fillStyle = "#FFA500";
-        context.fillText(jobTitle, canvasWidth / 2, usableTop - 40);
+        context.fillText(`${jobTitle} - ${salary}`, canvasWidth / 2, usableTop - 40);
 
         const numImages = images.length;
         const gridSize = Math.ceil(Math.sqrt(numImages * 4));
@@ -820,6 +824,14 @@ const CompanyPoster = ({
             x,
             y + imgRadius + 40
           );
+
+          // context.font = "12px Courier New";
+          // context.fillStyle = "#FFD700";
+          // context.fillText(
+          //   formatPackage(list[index].package, list[index].jobType) || "package Missing",
+          //   x,
+          //   y + imgRadius + 60
+          // );
         });
       } catch (err) {
         console.error("Error creating collage:", err);
@@ -880,7 +892,7 @@ const App = () => {
   return (
     <Router>
       <div className="app-container">
-        <Navigation />
+        {/* <Navigation /> */}
         <Routes>
           <Route path="/" element={<StudentForm />} />
           <Route path="/gen" element={<PosterGenerator />} />
