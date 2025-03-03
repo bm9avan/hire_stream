@@ -291,7 +291,7 @@ const PosterGenerator = () => {
   const [studentData, setStudentData] = useState([]);
   const [companyData, setCompanyData] = useState({});
   const [selectedCompany, setSelectedCompany] = useState("");
-  const [viewMode, setViewMode] = useState("table"); // "table" or "card"
+  const [viewMode, setViewMode] = useState("card"); // "table" or "card"
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [companyNormalizations, setCompanyNormalizations] = useState(new Map());
   const canvasRefs = useRef({});

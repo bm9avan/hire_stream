@@ -12,10 +12,11 @@ body {
 
 /* App Container */
 .app-container {
-  /* width: 100%; */
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 /* Navigation */
@@ -24,6 +25,7 @@ body {
   border-radius: 8px;
   margin-bottom: 20px;
   box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.3);
+  overflow: hidden;
 }
 
 .main-nav ul {
@@ -31,16 +33,18 @@ body {
   list-style: none;
   padding: 0;
   margin: 0;
+  flex-wrap: wrap;
 }
 
 .main-nav li {
-  flex: 1;
+  flex: 1 1 auto;
   text-align: center;
+  min-width: 120px;
 }
 
 .main-nav a {
   display: block;
-  padding: 15px;
+  padding: 15px 10px;
   color: #ffffff;
   text-decoration: none;
   font-weight: bold;
@@ -55,12 +59,13 @@ body {
 /* Form Container */
 .container {
   max-width: 500px;
-  width: 90%;
+  width: 100%;
   background: #1e1e1e;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.5);
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Form Elements */
@@ -68,6 +73,7 @@ body {
   text-align: center;
   color: #00ffff;
   margin-bottom: 20px;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
 }
 
 .form-group {
@@ -84,13 +90,14 @@ h3 {
 
 input,
 select {
-  width: 94%;
+  width: 100%;
   padding: 8px;
   margin-top: 5px;
   border: 1px solid #444;
   border-radius: 4px;
   background-color: #2a2a2a;
   color: #ffffff;
+  box-sizing: border-box;
 }
 
 input:focus,
@@ -121,12 +128,11 @@ select {
   background-color: #333;
   object-fit: cover;
   border: 2px solid #00ffff;
-  text-align: center;
-  align-content: center;
 }
 
 .profile-img input[type="file"] {
-  width: auto;
+  width: 100%;
+  max-width: 220px;
 }
 
 /* Company Section */
@@ -236,18 +242,22 @@ select {
   animation: popIn 0.6s ease-in-out;
 }
 
-/* Poster Generator Container */
+/* Poster Generator Container - IMPROVED FOR MOBILE */
 .poster-generator-container {
   background: #1e1e1e;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
   box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.5);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .poster-generator-container h2 {
   color: #00ffff;
   text-align: center;
   margin-bottom: 20px;
+  font-size: clamp(1.2rem, 4vw, 2rem);
 }
 
 /* Company List */
@@ -258,20 +268,26 @@ select {
 .company-list h3 {
   color: #00ffff;
   margin-bottom: 15px;
+  font-size: clamp(1rem, 3vw, 1.5rem);
 }
 
-/* Controls Section */
+/* Controls Section - IMPROVED FOR MOBILE */
 .controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
   flex-wrap: wrap;
+  gap: 10px;
 }
 
+/* View Controls - IMPROVED FOR MOBILE */
 .view-controls {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
 }
 
 .view-btn,
@@ -282,13 +298,17 @@ select {
   background: #333;
   color: white;
   border: none;
-  padding: 8px 15px;
+  padding: 10px 15px;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   transition: background-color 0.3s;
+  min-width: 80px;
+  font-size: 14px;
+  flex: 1 1 auto;
 }
 
 .view-btn:hover,
@@ -305,6 +325,8 @@ select {
 
 .download-all-btn {
   background: #28a745;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .download-all-btn:hover {
@@ -320,7 +342,7 @@ select {
 /* Company Cards View */
 .companies {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 20px;
 }
 
@@ -341,10 +363,12 @@ select {
   margin-top: 0;
   margin-bottom: 10px;
   text-transform: capitalize;
+  font-size: clamp(1rem, 3vw, 1.3rem);
 }
 
 .company-card p {
   margin: 5px 0;
+  font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
 .generate-btn {
@@ -357,43 +381,61 @@ select {
   background: #0069d9;
 }
 
-/* Companies Table View */
+/* Companies Table View - IMPROVED FOR MOBILE */
 .companies-table-container {
   overflow-x: auto;
   margin-bottom: 20px;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .companies-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 600px; /* Ensures table doesn't get too compressed */
 }
 
 .companies-table th,
 .companies-table td {
-  padding: 12px 15px;
+  padding: 12px 10px;
   border-bottom: 1px solid #333;
+  white-space: nowrap;
 }
 
 .companies-table th {
   background-color: #2a2a2a;
   color: #00ffff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .companies-table tr:hover {
   background-color: rgba(0, 255, 255, 0.05);
 }
 
+/* For small mobile screens, make the table more compact */
+@media screen and (max-width: 480px) {
+  .companies-table th,
+  .companies-table td {
+    padding: 8px 6px;
+    font-size: 14px;
+  }
+}
+
 /* Poster Container */
 .poster-container {
   margin-top: 30px;
   text-align: center;
+  width: 100%;
 }
 
 .poster-container h3 {
   color: #00ffff;
   margin-bottom: 15px;
   text-transform: capitalize;
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
 }
 
 .back-btn {
@@ -409,6 +451,7 @@ select {
 .poster-component {
   margin: 0 auto;
   text-align: center;
+  max-width: 100%;
 }
 
 .poster-component.visible {
@@ -425,6 +468,8 @@ select {
 .download-btn {
   background: #28a745;
   margin-top: 15px;
+  width: 100%;
+  max-width: 250px;
 }
 
 .download-btn:hover {
@@ -460,24 +505,71 @@ select {
   }
 }
 
-/* Responsive Styles */
+/* Enhanced Responsive Styles */
 @media screen and (max-width: 768px) {
   .controls {
     flex-direction: column;
     align-items: stretch;
+    gap: 15px;
   }
 
   .view-controls {
-    margin-top: 10px;
+    margin-top: 0;
     justify-content: center;
   }
 
   .companies {
     grid-template-columns: 1fr;
   }
+  
+  .container, 
+  .poster-generator-container {
+    padding: 15px;
+  }
+  
+  .main-nav a {
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+  
+  .main-nav li {
+    min-width: 100px;
+  }
+}
 
-  .companies-table th,
-  .companies-table td {
-    padding: 8px;
+@media screen and (max-width: 480px) {
+  .main-nav ul {
+    flex-direction: column;
+  }
+  
+  .main-nav li {
+    width: 100%;
+  }
+  
+  .main-nav a {
+    padding: 10px;
+  }
+  
+  .view-btn,
+  .download-all-btn,
+  .generate-btn,
+  .back-btn,
+  .download-btn {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  
+  .company {
+    padding: 15px 10px 10px;
+  }
+  
+  .remove-company {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .profile-img img {
+    width: 70px;
+    height: 70px;
   }
 }
