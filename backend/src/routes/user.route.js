@@ -10,6 +10,7 @@ import {
   uploadProfilePicture,
   verifyRequest,
   verifiedUsers,
+  getUsersPublic,
 } from "../controllers/user.controller.js";
 import { verifyToken } from "../middleware/user.middleware.js";
 import upload from "../middleware/multer.js";
@@ -30,6 +31,7 @@ router.put("/verify/:userId", verifyToken, verifyRequest);
 // router.delete("/delete/:userId", verifyToken, deleteUser);
 router.post("/signout", signout);
 router.get("/getusers", verifyToken, getUsers);
+router.get("/alllist", getUsersPublic);
 router.get("/:userId", verifyToken, getUser);
 
 export default router;

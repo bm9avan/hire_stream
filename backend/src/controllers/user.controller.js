@@ -402,6 +402,42 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
+export const getUsersPublic = async (req, res, next) => {
+  // if (!req.user.isAdmin) {
+  //   return next(errorHandler(403, "You are not allowed to view users"));
+  // }
+  try {
+    // const startIndex = parseInt(req.query.startIndex) || 0;
+    // const limit = parseInt(req.query.limit) || 9;
+    const sort = req.query.sort === "asc" ? 1 : -1;
+
+    const users = await db.query.users.findMany();
+    // .orderBy("createdAt", sort);
+    // .offset(startIndex)
+    // .limit(limit);
+    const usersWithOutPassword = users.map((user) => {
+      const { password, ...rest } = user;
+      return rest;
+    });
+
+    // const totalUsers = await db.query.users.count();
+    // const now = new Date();
+
+    // const oneMonthAgo = new Date(
+    //   now.getFullYear(),
+    //   now.getMonth() - 1,
+    //   now.getDate()
+    // );
+
+    // const lastMonthUsers = await db.query.users.count({
+    //   where: { createdAt: { gte: oneMonthAgo } },
+    // });
+    return res.status(200).json({ users: usersWithOutPassword });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const getUser = async (req, res, next) => {
   try {
     console.log("req");
